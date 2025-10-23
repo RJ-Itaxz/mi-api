@@ -1,0 +1,617 @@
+{
+  "info": {
+    "name": "ITO - API Asistente Virtual",
+    "description": "Colección completa de endpoints para la API del asistente virtual del Instituto Tecnológico de Oaxaca",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 Autenticación",
+      "item": [
+        {
+          "name": "POST - Registrar ADMIN",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nuevo Admin\",\n  \"email\": \"nuevo.admin@ito.edu.mx\",\n  \"password\": \"admin456\",\n  \"role\": \"ADMIN\",\n  \"adminCode\": \"ITO-ADMIN-2025\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "POST - Registrar ALUMNO",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan Pérez López\",\n  \"email\": \"juan.perez@alumno.ito.edu.mx\",\n  \"password\": \"alumno456\",\n  \"perfil\": {\n    \"grupo\": \"ISC-1B\",\n    \"semestre\": 1,\n    \"carrera\": \"ISC\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "POST - Login ADMIN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"adminToken\", jsonData.token);",
+                  "pm.environment.set(\"adminId\", jsonData.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@ito.edu.mx\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "POST - Login ALUMNO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"alumnoToken\", jsonData.token);",
+                  "pm.environment.set(\"alumnoId\", jsonData.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"carlos.mendoza@alumno.ito.edu.mx\",\n  \"password\": \"alumno123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "GET - Obtener mi perfil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumnoToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📚 Ejercicios",
+      "item": [
+        {
+          "name": "GET - Listar todos los ejercicios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ejercicios?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ejercicios"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET - Filtrar ejercicios por dificultad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ejercicios?dificultad=facil&page=1&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ejercicios"],
+              "query": [
+                {
+                  "key": "dificultad",
+                  "value": "facil"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET - Filtrar por tema",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ejercicios?tema=Control de Flujo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ejercicios"],
+              "query": [
+                {
+                  "key": "tema",
+                  "value": "Control de Flujo"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET - Obtener ejercicio por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data._id) {",
+                  "  pm.environment.set(\"ejercicioId\", jsonData.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ejercicios/{{ejercicioId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ejercicios", "{{ejercicioId}}"]
+            }
+          }
+        },
+        {
+          "name": "POST - Crear ejercicio (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data._id) {",
+                  "  pm.environment.set(\"nuevoEjercicioId\", jsonData.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Recursividad: Torres de Hanoi\",\n  \"tema\": \"Modularidad\",\n  \"dificultad\": \"dificil\",\n  \"descripcion\": \"Implementa el problema clásico de las Torres de Hanoi usando recursión. Mueve N discos de la torre A a la torre C usando la torre B como auxiliar.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ejercicios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ejercicios"]
+            }
+          }
+        },
+        {
+          "name": "PUT - Actualizar ejercicio (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Recursividad: Torres de Hanoi - ACTUALIZADO\",\n  \"dificultad\": \"media\",\n  \"descripcion\": \"Implementa el problema de las Torres de Hanoi. Versión simplificada para 3 discos.\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ejercicios/{{nuevoEjercicioId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ejercicios", "{{nuevoEjercicioId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE - Eliminar ejercicio (ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/ejercicios/{{nuevoEjercicioId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ejercicios", "{{nuevoEjercicioId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Alumnos",
+      "item": [
+        {
+          "name": "GET - Ver perfil y estadísticas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumnoToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/alumnos/{{alumnoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "alumnos", "{{alumnoId}}"]
+            }
+          }
+        },
+        {
+          "name": "GET - Ver ranking del alumno",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumnoToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/alumnos/{{alumnoId}}/ranking",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "alumnos", "{{alumnoId}}", "ranking"]
+            }
+          }
+        },
+        {
+          "name": "GET - Ver historial de resultados",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumnoToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/alumnos/{{alumnoId}}/resultados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "alumnos", "{{alumnoId}}", "resultados"]
+            }
+          }
+        },
+        {
+          "name": "PATCH - Actualizar perfil alumno",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumnoToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Carlos Mendoza López - ACTUALIZADO\",\n  \"perfil\": {\n    \"grupo\": \"ISC-2A\",\n    \"semestre\": 2,\n    \"carrera\": \"ISC\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/alumnos/{{alumnoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "alumnos", "{{alumnoId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Resultados",
+      "item": [
+        {
+          "name": "POST - Registrar resultado correcto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumnoToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ejercicio\": \"{{ejercicioId}}\",\n  \"correcto\": true,\n  \"puntaje\": 10,\n  \"tiempoSeg\": 180,\n  \"detalles\": {\n    \"intentos\": 1,\n    \"ayudaSolicitada\": false,\n    \"completado\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/resultados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resultados"]
+            }
+          }
+        },
+        {
+          "name": "POST - Registrar resultado incorrecto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumnoToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ejercicio\": \"{{ejercicioId}}\",\n  \"correcto\": false,\n  \"puntaje\": 3,\n  \"tiempoSeg\": 120,\n  \"detalles\": {\n    \"intentos\": 3,\n    \"ayudaSolicitada\": true,\n    \"erroresComunes\": [\"sintaxis\", \"lógica\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/resultados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resultados"]
+            }
+          }
+        },
+        {
+          "name": "GET - Mis resultados",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumnoToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/resultados/mios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resultados", "mios"]
+            }
+          }
+        },
+        {
+          "name": "GET - Ranking global",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/resultados/ranking?top=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resultados", "ranking"],
+              "query": [
+                {
+                  "key": "top",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏆 Ranking",
+      "item": [
+        {
+          "name": "GET - Ranking top 10",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ranking?top=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ranking"],
+              "query": [
+                {
+                  "key": "top",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET - Ranking top 20",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ranking?top=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ranking"],
+              "query": [
+                {
+                  "key": "top",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🤖 LLM - Asistente Virtual",
+      "item": [
+        {
+          "name": "POST - Solicitar explicación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumnoToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pregunta\": \"¿Qué es un arreglo multidimensional y cómo se declara?\",\n  \"tema\": \"Organización de datos\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/llm/explicacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "llm", "explicacion"]
+            }
+          }
+        },
+        {
+          "name": "POST - Solicitar feedback de código",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumnoToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"int factorial(int n) {\\n  if (n == 0) return 1;\\n  return n * factorial(n-1);\\n}\",\n  \"lenguaje\": \"C\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/llm/feedback",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "llm", "feedback"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "❤️ Health Check",
+      "item": [
+        {
+          "name": "GET - Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          }
+        },
+        {
+          "name": "GET - Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ]
+}

@@ -25,6 +25,39 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /api/ejercicios/numero/:numero
+router.get('/numero/:numero', async (req, res) => {
+  try {
+    const numero = parseInt(req.params.numero);
+    
+    if (isNaN(numero)) {
+      return res.status(400).json({
+        success: false,
+        error: 'El número de ejercicio debe ser un número válido'
+      });
+    }
+
+    const ejercicio = await Ejercicio.findOne({ numeroEjercicio: numero });
+
+    if (!ejercicio) {
+      return res.status(404).json({
+        success: false,
+        error: `Ejercicio #${numero} no encontrado`
+      });
+    }
+
+    res.json({
+      success: true,
+      data: ejercicio
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // GET /api/ejercicios/:id
 router.get('/:id', async (req, res) => {
   try {

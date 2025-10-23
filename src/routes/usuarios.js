@@ -20,6 +20,40 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET - Obtener un usuario por numeroUsuario
+router.get('/numero/:numero', async (req, res) => {
+  try {
+    const numero = parseInt(req.params.numero);
+    
+    if (isNaN(numero)) {
+      return res.status(400).json({
+        success: false,
+        error: 'El número de usuario debe ser un número válido'
+      });
+    }
+
+    const usuario = await Usuario.findOne({ numeroUsuario: numero })
+      .select('-password');
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: `Usuario #${numero} no encontrado`
+      });
+    }
+
+    res.json({
+      success: true,
+      data: usuario
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // GET - Obtener un usuario por ID
 router.get('/:id', async (req, res) => {
   try {

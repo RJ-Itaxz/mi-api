@@ -48,7 +48,13 @@ router.post('/register', async (req, res) => {
     });
 
     const token = signToken(usuario);
-    const usuarioSeguro = { id: usuario._id, nombre: usuario.nombre, email: usuario.email, role: usuario.role };
+    const usuarioSeguro = { 
+      id: usuario._id, 
+      numeroUsuario: usuario.numeroUsuario,
+      nombre: usuario.nombre, 
+      email: usuario.email, 
+      role: usuario.role 
+    };
 
     res.status(201).json({ success: true, token, user: usuarioSeguro });
   } catch (err) {
@@ -67,7 +73,13 @@ router.post('/login', async (req, res) => {
     if (!ok) return res.status(400).json({ success: false, error: 'Credenciales inválidas' });
 
     const token = signToken(usuario);
-    const usuarioSeguro = { id: usuario._id, nombre: usuario.nombre, email: usuario.email, role: usuario.role };
+    const usuarioSeguro = { 
+      id: usuario._id, 
+      numeroUsuario: usuario.numeroUsuario,
+      nombre: usuario.nombre, 
+      email: usuario.email, 
+      role: usuario.role 
+    };
     res.json({ success: true, token, user: usuarioSeguro });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

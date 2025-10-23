@@ -17,6 +17,7 @@ app.use(morgan('dev'));
 
 // Rutas
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/usuarios', require('./routes/usuarios'));
 app.use('/api/alumnos', require('./routes/alumnos'));
 app.use('/api/ejercicios', require('./routes/ejercicios'));
 app.use('/api/resultados', require('./routes/resultados'));
@@ -60,3 +61,4 @@ app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
   console.log(`📝 Modo: ${process.env.NODE_ENV || 'development'}`);
 });
+// nodemon: reload marker
