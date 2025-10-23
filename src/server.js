@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./config/database');
+const { isConfigured } = require('../services/geminiClient'); // <-- nuevo
 
 const app = express();
 
@@ -22,7 +23,8 @@ app.use('/api/alumnos', require('./routes/alumnos'));
 app.use('/api/ejercicios', require('./routes/ejercicios'));
 app.use('/api/resultados', require('./routes/resultados'));
 app.use('/api/ranking', require('./routes/ranking'));
-app.use('/api/llm', require('./routes/llm'));
+// app.use('/api/llm', require('./routes/llm')); // <-- quitar esta línea
+app.use('/api/llm', require('../routes/llm.routes')); // <-- usar router real fuera de /src
 
 // Rutas básicas
 app.get('/', (req, res) => {
@@ -60,5 +62,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
   console.log(`📝 Modo: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🤖 Gemini configurado: ${isConfigured()}`); // <-- log útil
 });
 // nodemon: reload marker
