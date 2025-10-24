@@ -21,7 +21,9 @@ async function authMiddleware(req, res, next) {
     if (!user) {
       return res.status(401).json({ success: false, error: 'Token inválido' });
     }
+    // Compatibilidad: algunos controladores usan req.user y otros req.usuario
     req.user = user; // user sin password
+    req.usuario = user; // alias para compatibilidad con controladores existentes
     next();
   } catch (err) {
     return res.status(401).json({ success: false, error: 'Token inválido o expirado' });
@@ -30,11 +32,20 @@ async function authMiddleware(req, res, next) {
 
 // Autorización por roles
 function authorizeRoles(...rolesPermitidos) {
+  // Normaliza roles de rutas: 'ADMINISTRADOR' -> 'ADMIN', 'ESTUDIANTE' -> 'ALUMNO', 'PROFESOR' -> 'ADMIN'
+  const normalize = (r) => {
+    if (!r) return r;
+    const up = String(r).toUpperCase();
+    if (up === 'ADMINISTRADOR' || up === 'PROFESOR') return 'ADMIN';
+    if (up === 'ESTUDIANTE') return 'ALUMNO';
+    return up;
+  };
+  const roles = rolesPermitidos.map(normalize);
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ success: false, error: 'No autenticado' });
     }
-    if (!rolesPermitidos.includes(req.user.role)) {
+    if (!roles.includes(req.user.role)) {
       return res.status(403).json({ success: false, error: 'No autorizado' });
     }
     next();
@@ -52,4 +63,8 @@ function selfOrAdmin(paramIdName = 'id') {
   };
 }
 
-module.exports = { authMiddleware, authorizeRoles, selfOrAdmin };
+// Alias para compatibilidad con rutas existentes
+const protect = authMiddleware;
+const authorize = (...roles) => authorizeRoles(...roles);
+
+module.exports = { authMiddleware, authorizeRoles, selfOrAdmin, protect, authorize };

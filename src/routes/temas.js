@@ -1,18 +1,18 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const { 
-  listByTema, 
+  listByUnidad, 
   getOne, 
   create, 
   update, 
   remove 
-} = require('../controllers/ejerciciosController');
+} = require('../controllers/temasController');
 const { protect, authorize } = require('../middlewares/auth');
 
 router.use(protect);
 
 router.route('/')
-  .get(listByTema)
+  .get(listByUnidad)
   .post(authorize('ADMINISTRADOR'), create);
 
 router.route('/:id')

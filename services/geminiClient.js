@@ -35,13 +35,14 @@ async function generateText({
   if (!API_KEY) throw new Error('Missing GOOGLE_GEMINI_API_KEY in environment.');
   model = normalizeModel(model);
   const url = `${BASE}/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(API_KEY)}`;
+  
+  // Si hay system prompt, combinarlo con el user prompt para v1 API
+  const finalPrompt = system ? `${system}\n\n${prompt}` : prompt;
+  
   const body = {
-    contents: [{ role: 'user', parts: [{ text: prompt }]}],
+    contents: [{ role: 'user', parts: [{ text: finalPrompt }]}],
     generationConfig: { temperature, maxOutputTokens, topP, topK }
   };
-  if (system) {
-    body.systemInstruction = { role: 'system', parts: [{ text: system }] };
-  }
 
   const res = await fetchFn(url, {
     method: 'POST',

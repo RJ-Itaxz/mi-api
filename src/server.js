@@ -23,8 +23,17 @@ app.use('/api/alumnos', require('./routes/alumnos'));
 app.use('/api/ejercicios', require('./routes/ejercicios'));
 app.use('/api/resultados', require('./routes/resultados'));
 app.use('/api/ranking', require('./routes/ranking'));
-// app.use('/api/llm', require('./routes/llm')); // <-- quitar esta línea
-app.use('/api/llm', require('../routes/llm.routes')); // <-- usar router real fuera de /src
+// Rutas LLM (usar la que existe dentro de src)
+app.use('/api/llm', require('./routes/llm'));
+
+// Rutas jerárquicas adicionales (consolidadas desde el server.js raíz)
+app.use('/api/materias', require('./routes/materias'));
+app.use('/api/materias/:materiaId/unidades', require('./routes/unidades'));
+app.use('/api/unidades', require('./routes/unidades'));
+app.use('/api/unidades/:unidadId/temas', require('./routes/temas'));
+app.use('/api/temas', require('./routes/temas'));
+app.use('/api/temas/:temaId/ejercicios', require('./routes/ejercicios'));
+app.use('/api/ejercicios/:ejercicioId/resultados', require('./routes/resultados'));
 
 // Rutas básicas
 app.get('/', (req, res) => {
