@@ -1,0 +1,12 @@
+{
+  // Evita que VS Code intente descargar esquemas JSON desde Internet (evita errores de timeout con schemastore)
+  "json.schemaDownload.enable": false,
+
+  // Evita mostrar/indexar node_modules en el explorador (reduce ruido)
+  "files.exclude": {
+    "**/node_modules": true
+  },
+
+  // Mantener validación JSON habilitada localmente
+  "json.validate.enable": true
+}

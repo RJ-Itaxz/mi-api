@@ -3,10 +3,44 @@ const { authMiddleware } = require('../middlewares/auth');
 const Tema = require('../models/Tema');
 const Unidad = require('../models/Unidad');
 const Materia = require('../models/Materia');
+const Informacion = require('../models/Informacion');
 const { generateText, isConfigured } = require('../../services/geminiClient');
+const { selfTest } = require('../../services/geminiClient');
 const Ejercicio = require('../models/Ejercicio');
 
 const router = express.Router();
+
+// GET /api/llm/health - Estado de salud del cliente LLM (rápido) o test completo
+// Query param: full=true para ejecutar un selfTest que realiza una llamada a Gemini
+router.get('/health', async (req, res) => {
+  try {
+    const full = req.query.full === 'true' || req.query.full === '1';
+    const configured = isConfigured();
+
+    const mongoose = require('mongoose');
+    const dbStateMap = {
+      0: 'disconnected',
+      1: 'connected',
+      2: 'connecting',
+      3: 'disconnecting'
+    };
+
+    const basic = {
+      llmConfigured: configured,
+      dbState: dbStateMap[mongoose.connection.readyState] || mongoose.connection.readyState,
+      timestamp: new Date().toISOString()
+    };
+
+    if (!full) return res.json({ success: true, data: basic });
+
+    // full true -> ejecutar selfTest (puede demorar y hace una llamada a la API de Gemini)
+    const test = await selfTest();
+    return res.json({ success: true, data: { ...basic, selfTest: test } });
+  } catch (err) {
+    console.error('LLM health check error:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // POST /api/llm/generar-ejercicio - Genera ejercicio con Gemini basado en un tema
 router.post('/generar-ejercicio', authMiddleware, async (req, res) => {
@@ -42,11 +76,31 @@ router.post('/generar-ejercicio', authMiddleware, async (req, res) => {
       });
     }
     
+    // Buscar información detallada del tema
+    const informacion = await Informacion.findOne({ tema: temaId });
+    
     // Construir contexto para Gemini
     const materia = tema.unidad.materia.nombre;
     const unidad = tema.unidad.titulo;
     const tituloTema = tema.titulo;
     const contenidoTema = tema.contenido || '';
+    
+    // Si hay información disponible, usar el contexto enriquecido
+    let contextoDetallado = '';
+    if (informacion) {
+      const contextoLLM = informacion.getContextoLLM();
+      contextoDetallado = `
+CONCEPTOS CLAVE:
+${contextoLLM.conceptos}
+
+${contextoLLM.ejemploBreve ? `EJEMPLO: ${contextoLLM.ejemploBreve}` : ''}
+
+${contextoLLM.ejerciciosEjemplo ? `EJERCICIOS DE REFERENCIA:
+${contextoLLM.ejerciciosEjemplo}` : ''}
+
+${contextoLLM.contenidoAdicional ? `CONTENIDO ADICIONAL:
+${contextoLLM.contenidoAdicional}` : ''}`;
+    }
     
     // Crear prompt para Gemini
     const systemPrompt = `Eres un profesor experto en ${materia}. 
@@ -62,6 +116,7 @@ Materia: ${materia}
 Unidad: ${unidad}
 Tema: ${tituloTema}
 ${contenidoTema ? `Contenido: ${contenidoTema.substring(0, 500)}` : ''}
+${contextoDetallado}
 
 Dificultad: ${dificultad}
 
@@ -86,6 +141,7 @@ Materia: ${materia}
 Unidad: ${unidad}
 Tema: ${tituloTema}
 ${contenidoTema ? `Contenido: ${contenidoTema.substring(0, 500)}` : ''}
+${contextoDetallado}
 
 Dificultad: ${dificultad}
 
@@ -161,13 +217,31 @@ Responde SOLO con un objeto JSON con esta estructura exacta:
           payload.numeroEjercicio = ejercicioGenerado.numeroEjercicio;
         }
 
+        // Si hay información disponible, relacionar el ejercicio con ella
+        if (informacion) {
+          payload.informacion = informacion._id;
+          // Incrementar contador de ejercicios generados
+          await Informacion.findByIdAndUpdate(
+            informacion._id, 
+            { 
+              $inc: { 'estadisticas.ejerciciosGenerados': 1 },
+              'estadisticas.ultimaActualizacion': new Date()
+            }
+          );
+        }
+
         const saved = await Ejercicio.create(payload);
 
         return res.status(201).json({
           success: true,
           data: {
             ejercicio: saved,
-            contexto: { materia, unidad, tema: tituloTema }
+            contexto: { 
+              materia, 
+              unidad, 
+              tema: tituloTema,
+              informacionUsada: !!informacion
+            }
           },
           message: 'Ejercicio generado y guardado exitosamente'
         });
@@ -187,7 +261,8 @@ Responde SOLO con un objeto JSON con esta estructura exacta:
         contexto: {
           materia,
           unidad,
-          tema: tituloTema
+          tema: tituloTema,
+          informacionUsada: !!informacion
         }
       },
       message: 'Ejercicio generado exitosamente por Gemini'

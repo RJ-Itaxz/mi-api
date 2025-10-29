@@ -25,6 +25,8 @@ app.use('/api/resultados', require('./routes/resultados'));
 app.use('/api/ranking', require('./routes/ranking'));
 // Rutas LLM (usar la que existe dentro de src)
 app.use('/api/llm', require('./routes/llm'));
+// Rutas de evaluación (evaluar ejercicios / sesiones)
+app.use('/api/evaluacion', require('./routes/evaluacion'));
 
 // Rutas jerárquicas adicionales (consolidadas desde el server.js raíz)
 app.use('/api/materias', require('./routes/materias'));
@@ -33,6 +35,8 @@ app.use('/api/unidades', require('./routes/unidades'));
 app.use('/api/unidades/:unidadId/temas', require('./routes/temas'));
 app.use('/api/temas', require('./routes/temas'));
 app.use('/api/temas/:temaId/ejercicios', require('./routes/ejercicios'));
+app.use('/api/temas/:temaId/informacion', require('./routes/informacion'));
+app.use('/api/informacion', require('./routes/informacion'));
 app.use('/api/ejercicios/:ejercicioId/resultados', require('./routes/resultados'));
 
 // Rutas básicas

@@ -7,13 +7,18 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "seed": "node src/scripts/seed.js",
-    "seed:programacion": "node src/scripts/seedProgramacion.js"
+    "seed:programacion": "node src/scripts/seedProgramacion.js",
+    "seed:informacion": "node src/scripts/seedInformacion.js",
+    "seed:ejercicios": "node src/scripts/seedEjercicios.js",
+    "test:ejercicios": "node test-ejercicios-simple.js",
+    "test:evaluacion": "node test-evaluacion-llm.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

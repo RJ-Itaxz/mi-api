@@ -5,7 +5,15 @@ const EjercicioSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Tema', 
     required: [true, 'El tema es requerido'],
-    index: true 
+    // índice simple removido intencionalmente: existe un índice compuesto
+    // EjercicioSchema.index({ tema: 1, numeroEjercicio: 1 }) que ya cubre
+    // la necesidad de búsquedas por tema + número. Mantener ambos puede
+    // provocar la advertencia de índice duplicado en Mongoose.
+  },
+  informacion: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Informacion',
+    index: true
   },
   titulo: { 
     type: String, 
